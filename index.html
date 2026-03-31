@@ -16,28 +16,16 @@ body, html {
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* Invisible full-screen layer for tapping */
-#tap-zone {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 1;
 }
 
 /* Scene */
 #scene {
-  position: relative;
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 5;
 }
 
 /* Bubble */
@@ -53,49 +41,41 @@ body, html {
   margin-bottom: 25px;
   transition: all 0.6s ease;
   text-align: center;
-  max-width: 80%;
 }
 
-/* Character Container (Handles Sitting/Standing/Bowing) */
+/* Character */
 #character-container {
-  position: relative;
   transition: transform 1s ease;
-  display: flex;
-  justify-content: center;
+  position: relative;
 }
 
-.bowing { transform: rotate(-20deg) translateY(20px); }
+.bowing { transform: rotate(-15deg) translateY(20px); }
 .sitting { transform: translateY(60px); }
 
-/* Character (Handles Floating & Image) */
+/* Avatar (FIXED IMAGE HERE) */
 #character {
-  width: 160px;
-  height: 210px;
-  border-radius: 80px 80px 30px 30px;
-  
-  /* PUT YOUR IMAGE FILENAME HERE */
-  background-image: url('my-photo.png'); 
-  
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background-image: url('my-photo.png.jpeg'); /* ✅ FIXED */
   background-size: cover;
-  background-position: center;
-  border: 4px solid white;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  background-position: center top;
+  border: 5px solid white;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
   animation: float 3s ease-in-out infinite;
-  z-index: 10;
 }
 
-/* Floating animation */
+/* Floating */
 @keyframes float {
   0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  50% { transform: translateY(-10px); }
 }
 
 /* Chair */
 #chair {
-  font-size: 110px;
+  font-size: 100px;
   position: absolute;
   bottom: -40px;
-  z-index: -1; /* Keeps chair behind the character */
   opacity: 0;
   transition: opacity 1s ease;
 }
@@ -103,40 +83,34 @@ body, html {
 /* UI */
 #ui {
   opacity: 0;
-  pointer-events: none;
-  margin-top: 50px;
-  transition: opacity 0.6s ease;
-  z-index: 20;
+  margin-top: 40px;
+  transition: opacity 0.5s ease;
 }
 
-#ui.active { 
-  opacity: 1; 
-  pointer-events: auto;
-}
+#ui.active { opacity: 1; }
 
 button {
   padding: 16px 28px;
   margin: 10px;
   border: none;
   border-radius: 50px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   cursor: pointer;
   font-weight: bold;
   transition: 0.2s;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 button:active { transform: scale(0.9); }
 
-#btn-slap { background: #ffccbc; color: #d84315; }
-#btn-kiss { background: #f48fb1; color: #880e4f; }
+#btn-slap { background: #ffccbc; }
+#btn-kiss { background: #f48fb1; }
 
 /* Animations */
 .slap { animation: slapAnim 0.4s ease; }
 @keyframes slapAnim {
   0% { transform: translateX(0); }
-  30% { transform: translateX(-20px) rotate(-5deg); }
-  60% { transform: translateX(15px) rotate(5deg); }
+  30% { transform: translateX(-20px); }
+  60% { transform: translateX(15px); }
   100% { transform: translateX(0); }
 }
 
@@ -150,30 +124,26 @@ button:active { transform: scale(0.9); }
 /* Hearts */
 .heart {
   position: absolute;
-  font-size: 24px;
+  font-size: 22px;
   animation: rise 1.2s ease forwards;
-  z-index: 15;
-  pointer-events: none;
 }
 @keyframes rise {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-120px); }
 }
 
-/* Glow effect */
+/* Glow */
 .glow {
-  animation: glow 1.5s ease infinite alternate;
+  animation: glow 1s ease infinite alternate;
 }
 @keyframes glow {
-  0% { box-shadow: 0 0 10px pink, 0 15px 35px rgba(0,0,0,0.25); }
-  100% { box-shadow: 0 0 40px #ff4081, 0 15px 35px rgba(0,0,0,0.25); }
+  0% { box-shadow: 0 0 10px pink; }
+  100% { box-shadow: 0 0 40px #ff4081; }
 }
 </style>
 </head>
 
 <body>
-
-<div id="tap-zone"></div>
 
 <div id="scene">
   <div id="bubble">Hey… can we talk?</div>
@@ -192,114 +162,78 @@ button:active { transform: scale(0.9); }
 <script>
 let slaps = 0;
 let kisses = 0;
-const max = 10;
-let isActive = false;
+const max = 8;
 
 const bubble = document.getElementById("bubble");
 const character = document.getElementById("character");
-const charContainer = document.getElementById("character-container");
+const container = document.getElementById("character-container");
 const chair = document.getElementById("chair");
 const ui = document.getElementById("ui");
-const tapZone = document.getElementById("tap-zone");
 
-/* Intro sequence */
-setTimeout(() => {
-  charContainer.classList.add("bowing");
-  bubble.innerText = "I'm really sorry for yesterday";
-  bubble.style.opacity = 1;
-}, 1000);
+/* Intro */
+setTimeout(()=>{
+  container.classList.add("bowing");
+  bubble.innerText="I'm really sorry...";
+  bubble.style.opacity=1;
+},1000);
 
-setTimeout(() => {
-  charContainer.classList.remove("bowing");
-  charContainer.classList.add("sitting");
-  chair.style.opacity = 1;
-  bubble.style.opacity = 0;
-}, 3500);
+setTimeout(()=>{
+  container.classList.remove("bowing");
+  container.classList.add("sitting");
+  chair.style.opacity=1;
+  bubble.innerText="I didn't mean to hurt you ❤️";
+},3000);
 
-setTimeout(() => {
+setTimeout(()=>{
   ui.classList.add("active");
-  isActive = true;
-}, 4500);
+},4500);
 
 /* Actions */
-function doSlap() {
-  if (!isActive) return;
+document.getElementById("btn-slap").onclick=()=>{
   slaps++;
   animate("slap");
-  bubble.innerText = "Okay… I deserve that 😔";
-  bubble.style.opacity = 1;
-  checkEnd();
-}
+  bubble.innerText="Okay… I deserve that 😔";
+  endCheck();
+};
 
-function doKiss() {
-  if (!isActive) return;
+document.getElementById("btn-kiss").onclick=()=>{
   kisses++;
   animate("kiss");
   spawnHearts();
-  bubble.innerText = "Thank you… that means a lot 💖";
-  bubble.style.opacity = 1;
-  checkEnd();
-}
-
-/* Listeners */
-document.getElementById("btn-slap").addEventListener('pointerdown', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  doSlap();
-});
-
-document.getElementById("btn-kiss").addEventListener('pointerdown', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  doKiss();
-});
-
-tapZone.addEventListener('pointerdown', (e) => {
-  e.preventDefault();
-  doSlap(); // Tapping screen defaults to slap
-});
+  bubble.innerText="Thank you… that means a lot 💖";
+  endCheck();
+};
 
 function animate(type){
   character.classList.remove("slap","kiss");
-  void character.offsetWidth; // Trigger reflow
+  void character.offsetWidth;
   character.classList.add(type);
 }
 
 /* Hearts */
 function spawnHearts(){
-  for(let i=0; i<4; i++){
-    let h = document.createElement("div");
+  for(let i=0;i<4;i++){
+    let h=document.createElement("div");
     h.className="heart";
     h.innerText="💖";
-    
-    // Calculate position relative to the character
-    const rect = character.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    h.style.left = (centerX + Math.random()*80-50)+"px";
-    h.style.top = (centerY + Math.random()*40-20)+"px";
-    
+    h.style.left=(window.innerWidth/2 + Math.random()*80-40)+"px";
+    h.style.top=(window.innerHeight/2)+"px";
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(), 1200);
+    setTimeout(()=>h.remove(),1200);
   }
 }
 
-/* Ending */
-function checkEnd(){
-  if(slaps >= max || kisses >= max){
-    isActive = false;
-    ui.style.opacity = "0";
-    ui.style.pointerEvents = "none";
-    
+/* End */
+function endCheck(){
+  if(slaps>=max || kisses>=max){
+    ui.style.display="none";
     setTimeout(()=>{
-      // Character stands up
-      charContainer.classList.remove("sitting");
-      chair.style.opacity = 0;
-      bubble.innerText = "I love u ❤️";
+      container.classList.remove("sitting");
+      chair.style.opacity=0;
+      bubble.innerText="I love u ❤️";
       character.classList.add("glow");
       spawnHearts();
-      setTimeout(spawnHearts, 400);
-      setTimeout(spawnHearts, 800);
-    }, 1000);
+    },800);
   }
 }
 </script>
