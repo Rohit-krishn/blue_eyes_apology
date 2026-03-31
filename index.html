@@ -15,29 +15,22 @@ body{
   justify-content:center;
   align-items:center;
   height:100vh;
+  transition:1s;
 }
 
-body::after{
-  content:"";
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:radial-gradient(circle, transparent 60%, rgba(0,0,0,0.2));
+/* DARK MODE (sad ending) */
+body.sad-mode{
+  background: radial-gradient(circle at center, #444, #111);
 }
 
-/* tap */
-#tap-zone{
-  position:absolute;
-  width:100%;
-  height:100%;
-}
-
-/* scene */
+/* SCENE */
 #scene{
   text-align:center;
+  position:relative;
+  z-index:10;
 }
 
-/* bubble */
+/* BUBBLE */
 #bubble{
   opacity:0;
   background:white;
@@ -45,13 +38,13 @@ body::after{
   border-radius:22px;
   margin-bottom:20px;
   font-size:1.2rem;
-  transition:0.5s;
   max-width:300px;
+  min-height:50px;
 }
 
-/* avatar */
+/* AVATAR */
 #avatar{
-  transition:0.3s;
+  transition:0.4s;
 }
 
 /* HEAD */
@@ -67,32 +60,24 @@ body::after{
 
   border:5px solid white;
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.3),
-    inset 0 0 20px rgba(255,255,255,0.25);
-
-  filter: contrast(1.15) brightness(1.05) saturate(1.2);
-
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
   transition:0.3s;
 
   animation:idle 5s infinite ease-in-out;
 }
 
-/* SAD FACE */
 #head.sad{
   background-image:url("Rohit_sad.jpeg");
-  background-size:220%;
-  background-position:50% 20%;
-  filter: grayscale(20%) brightness(0.95);
+  filter: grayscale(30%) brightness(0.8);
 }
 
-/* idle */
+/* IDLE */
 @keyframes idle{
-  0%,100%{transform:rotate(0deg) translateY(0);}
-  50%{transform:rotate(2deg) translateY(-5px);}
+  0%,100%{transform:rotate(0deg);}
+  50%{transform:rotate(2deg);}
 }
 
-/* body */
+/* BODY */
 #body{
   width:170px;
   height:95px;
@@ -122,64 +107,44 @@ button{
   cursor:pointer;
 }
 
-/* animations */
-.head-slap{
-  animation:slap 0.4s;
-}
+/* ANIMATIONS */
+.head-slap{ animation:slap 0.4s; }
 @keyframes slap{
-  0%{transform:rotate(0);}
-  30%{transform:rotate(-25deg) scale(0.95);}
+  30%{transform:rotate(-25deg);}
   60%{transform:rotate(20deg);}
-  100%{transform:rotate(0);}
 }
 
-.head-kiss{
-  animation:kiss 0.4s;
-}
+.head-kiss{ animation:kiss 0.4s; }
 @keyframes kiss{
   50%{transform:scale(1.2);}
 }
 
-/* shake */
-.shake{
-  animation:shake 0.3s;
-}
-@keyframes shake{
-  0%,100%{transform:translateX(0);}
-  25%{transform:translateX(-10px);}
-  75%{transform:translateX(10px);}
-}
-
-/* glow */
 .glow{
   box-shadow:0 0 40px #ff4081;
 }
 
-/* hearts */
+/* HEARTS */
 .heart{
   position:absolute;
   font-size:22px;
   animation:rise 1.2s forwards;
 }
 @keyframes rise{
-  0%{opacity:1; transform:translateY(0);}
-  100%{opacity:0; transform:translateY(-140px);}
+  to{opacity:0; transform:translateY(-140px);}
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUDIO -->
-<audio id="bg-music" loop>
+<!-- MUSIC -->
+<audio id="music" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<div id="tap-zone"></div>
-
 <div id="scene">
 
-<div id="bubble">Hey... can we talk?</div>
+<div id="bubble"></div>
 
 <div id="avatar">
   <div id="head"></div>
@@ -195,113 +160,93 @@ button{
 
 <script>
 
-let slaps=0, kisses=0;
-let active=false;
+/* ELEMENTS */
+const bubble = document.getElementById("bubble");
+const head = document.getElementById("head");
+const ui = document.getElementById("ui");
+const music = document.getElementById("music");
 
-const bubble=document.getElementById("bubble");
-const head=document.getElementById("head");
-const avatar=document.getElementById("avatar");
-const ui=document.getElementById("ui");
-const music=document.getElementById("bg-music");
+let slaps=0, kisses=0, active=false, musicStarted=false;
 
-let musicStarted=false;
+/* TYPEWRITER */
+function typeText(text, speed=40){
+  bubble.innerText="";
+  bubble.style.opacity=1;
+  let i=0;
+  let interval=setInterval(()=>{
+    bubble.innerText += text[i];
+    i++;
+    if(i>=text.length) clearInterval(interval);
+  }, speed);
+}
 
-/* fade in music */
-function fadeInMusic(){
-  music.volume = 0;
-  music.play();
-  let v = 0;
-  let fade = setInterval(()=>{
-    if(v >= 0.4){
-      clearInterval(fade);
-    } else {
-      v += 0.02;
-      music.volume = v;
-    }
-  }, 200);
+/* MUSIC */
+function startMusic(){
+  if(!musicStarted){
+    music.volume=0;
+    music.play().catch(()=>{});
+    musicStarted=true;
+
+    let v=0;
+    let fade=setInterval(()=>{
+      if(v>=0.4){ clearInterval(fade);}
+      else{ v+=0.02; music.volume=v;}
+    },200);
+  }
 }
 
 /* STORY */
+setTimeout(()=>typeText("I didn’t handle things right..."),1000);
+setTimeout(()=>typeText("And I know I hurt you."),4000);
+setTimeout(()=>typeText("You don’t have to forgive me..."),7000);
+setTimeout(()=>typeText("But I wanted to try..."),10000);
 setTimeout(()=>{
-  bubble.innerText="I didn’t handle things right...";
-  bubble.style.opacity=1;
-},1000);
-
-setTimeout(()=>{
-  bubble.innerText="And I know I hurt you.";
-},3000);
-
-setTimeout(()=>{
-  bubble.innerText="You don’t have to forgive me...";
-},5000);
-
-setTimeout(()=>{
-  bubble.innerText="But I wanted to try...";
-},7000);
-
-setTimeout(()=>{
-  bubble.innerText="React however you feel.";
-},9000);
-
-setTimeout(()=>{
+  typeText("React however you feel.");
   ui.classList.add("active");
   active=true;
-},10500);
+},13000);
 
 /* ACTIONS */
 function slap(){
-  if(!active) return;
+  startMusic();
 
-  if(!musicStarted){
-    fadeInMusic();
-    musicStarted=true;
+  if(!active){
+    typeText("Wait… please listen first.");
+    return;
   }
 
   slaps++;
+  head.classList.add("head-slap","sad");
+  setTimeout(()=>head.classList.remove("head-slap"),400);
 
-  animate("slap");
-
-  avatar.classList.add("shake");
-  setTimeout(()=>avatar.classList.remove("shake"),300);
-
-  head.classList.add("sad");
-
-  bubble.innerText = slaps<3 
-    ? "...yeah, I deserve that." 
-    : "I really messed up, didn’t I?";
+  if(slaps<3) typeText("...yeah, I deserve that.");
+  else typeText("I really messed up, didn’t I?");
 
   checkEnd();
 }
 
 function kiss(){
-  if(!active) return;
+  startMusic();
 
-  if(!musicStarted){
-    fadeInMusic();
-    musicStarted=true;
+  if(!active){
+    typeText("Wait… please listen first.");
+    return;
   }
 
   kisses++;
+  head.classList.add("head-kiss");
+  head.classList.remove("sad");
+  setTimeout(()=>head.classList.remove("head-kiss"),400);
 
-  animate("kiss");
   spawnHearts();
 
-  head.classList.remove("sad");
-
-  bubble.innerText = kisses<3 
-    ? "You’re kinder than I deserve..." 
-    : "Why are you so good to me? 💖";
+  if(kisses<3) typeText("You’re kinder than I deserve...");
+  else typeText("Why are you so good to me? 💖");
 
   checkEnd();
 }
 
-function animate(type){
-  head.classList.remove("head-slap","head-kiss");
-  void head.offsetWidth;
-  head.classList.add(type==="slap"?"head-slap":"head-kiss");
-}
-
-/* hearts */
+/* HEARTS */
 function spawnHearts(){
   for(let i=0;i<5;i++){
     let h=document.createElement("div");
@@ -314,7 +259,7 @@ function spawnHearts(){
   }
 }
 
-/* ending */
+/* ENDING */
 function checkEnd(){
   if(slaps>=6 || kisses>=6){
     active=false;
@@ -322,27 +267,24 @@ function checkEnd(){
 
     setTimeout(()=>{
       if(kisses>slaps){
-        bubble.innerText="I love you ❤️";
-        head.classList.remove("sad");
+        typeText("I love you ❤️");
         head.classList.add("glow");
-
         spawnHearts();
-        setTimeout(spawnHearts,300);
-        setTimeout(spawnHearts,600);
-
-        avatar.style.transform="scale(1.1)";
       } else {
-        bubble.innerText="I’ll fix myself… I promise.";
-        head.classList.add("sad");
+        typeText("I’ll fix myself… I promise.");
+        document.body.classList.add("sad-mode");
       }
     },1000);
   }
 }
 
-/* events */
+/* EVENTS */
 document.getElementById("slap").onclick=slap;
 document.getElementById("kiss").onclick=kiss;
-document.getElementById("tap-zone").onclick=slap;
+
+document.body.addEventListener("click",(e)=>{
+  if(e.target.tagName!=="BUTTON") slap();
+});
 
 </script>
 
