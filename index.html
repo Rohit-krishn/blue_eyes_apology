@@ -26,6 +26,25 @@ body.sad-mode{
   text-align:center;
 }
 
+/* START OVERLAY TO UNLOCK MUSIC */
+#start-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.5s;
+}
+
 /* BUBBLE */
 #bubble{
   opacity:0;
@@ -51,6 +70,7 @@ body.sad-mode{
   background-image:url("Rohit.jpeg");
   background-size:260%;
   background-position:55% 25%;
+  background-color: #ddd; /* Fallback color */
 
   border:5px solid white;
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
@@ -99,6 +119,7 @@ button{
   border-radius:50px;
   margin:5px;
   cursor:pointer;
+  font-size: 1rem;
 }
 
 /* ANIMATIONS */
@@ -121,6 +142,7 @@ button{
 .heart{
   position:absolute;
   font-size:22px;
+  pointer-events:none;
   animation:rise 1.2s forwards;
 }
 @keyframes rise{
@@ -130,6 +152,9 @@ button{
 </head>
 
 <body>
+
+<!-- START SCREEN TO FIX AUTOPLAY BUG -->
+<div id="start-overlay">Tap anywhere to start ❤️</div>
 
 <!-- MUSIC -->
 <audio id="music" loop preload="auto">
@@ -158,20 +183,21 @@ const bubble = document.getElementById("bubble");
 const head = document.getElementById("head");
 const ui = document.getElementById("ui");
 const music = document.getElementById("music");
+const startOverlay = document.getElementById("start-overlay");
 
 let slaps=0, kisses=0, active=false;
-let musicStarted=false;
 let typingTimer=null;
+let storyRunning = true;
 
-/* FIXED TYPEWRITER (WITH SPACE FIX) */
+/* FIXED TYPEWRITER (USES textContent INSTEAD OF innerText) */
 function typeText(text, speed=35){
   clearInterval(typingTimer);
-  bubble.innerText="";
+  bubble.textContent=""; // Fixes the missing space bug
   bubble.style.opacity=1;
 
   let i=0;
   typingTimer=setInterval(()=>{
-    bubble.innerText += text.charAt(i);  // FIXED
+    bubble.textContent += text.charAt(i); 
     i++;
     if(i>=text.length){
       clearInterval(typingTimer);
@@ -181,63 +207,67 @@ function typeText(text, speed=35){
 
 /* PERFECT MUSIC UNLOCK */
 function unlockMusic(){
-  if(musicStarted) return;
+  music.volume = 0;
+  let playPromise = music.play();
 
-  musicStarted = true;
-
-  const playAudio = () => {
-    music.volume = 0;
-    let playPromise = music.play();
-
-    if(playPromise !== undefined){
-      playPromise.then(()=>{
-        let v=0;
-        let fade=setInterval(()=>{
-          if(v>=0.4){
-            clearInterval(fade);
-          } else {
-            v+=0.02;
-            music.volume=v;
-          }
-        },200);
-      }).catch(()=>{});
-    }
-  };
-
-  playAudio();
+  if(playPromise !== undefined){
+    playPromise.then(()=>{
+      let v=0;
+      let fade=setInterval(()=>{
+        if(v>=0.4){
+          clearInterval(fade);
+        } else {
+          v+=0.02;
+          music.volume=v;
+        }
+      },200);
+    }).catch((error)=>{
+      console.log("Audio failed to play:", error);
+    });
+  }
 }
 
 /* STORY */
 async function story(){
   await delay(1000);
+  if(!storyRunning) return;
   typeText("I didn’t handle things right...");
 
   await delay(3000);
+  if(!storyRunning) return;
   typeText("And I know I hurt you.");
 
   await delay(3000);
+  if(!storyRunning) return;
   typeText("You don’t have to forgive me...");
 
   await delay(3000);
+  if(!storyRunning) return;
   typeText("But I wanted to try...");
 
   await delay(3000);
+  if(!storyRunning) return;
   typeText("React however you feel.");
 
   ui.classList.add("active");
   active=true;
+  storyRunning = false;
 }
 
 function delay(ms){
   return new Promise(r=>setTimeout(r,ms));
 }
 
-story();
+/* ANIMATION RESET HELPER */
+function triggerAnimation(animClass) {
+  head.classList.remove("head-slap", "head-kiss");
+  void head.offsetWidth; // Forces the browser to reset the animation
+  head.classList.add(animClass);
+}
 
 /* ACTIONS */
 function slap(e){
   e?.stopPropagation();
-  unlockMusic();
 
   if(!active){
     typeText("Wait… please listen first.");
@@ -245,11 +275,9 @@ function slap(e){
   }
 
   slaps++;
-
-  head.classList.remove("head-kiss");
-  head.classList.add("head-slap","sad");
-
-  setTimeout(()=>head.classList.remove("head-slap"),400);
+  
+  triggerAnimation("head-slap");
+  head.classList.add("sad");
 
   if(slaps<3){
     typeText("...yeah, I deserve that.");
@@ -262,7 +290,6 @@ function slap(e){
 
 function kiss(e){
   e?.stopPropagation();
-  unlockMusic();
 
   if(!active){
     typeText("Wait… please listen first.");
@@ -271,10 +298,8 @@ function kiss(e){
 
   kisses++;
 
-  head.classList.remove("head-slap","sad");
-  head.classList.add("head-kiss");
-
-  setTimeout(()=>head.classList.remove("head-kiss"),400);
+  triggerAnimation("head-kiss");
+  head.classList.remove("sad");
 
   spawnHearts();
 
@@ -326,9 +351,17 @@ function checkEnd(){
 document.getElementById("slap").addEventListener("click", slap);
 document.getElementById("kiss").addEventListener("click", kiss);
 
-/* GLOBAL CLICK = ALSO UNLOCK MUSIC */
+/* START BUTTON LISTENER (FIXES MUSIC) */
+startOverlay.addEventListener("click", () => {
+  startOverlay.style.opacity = "0";
+  setTimeout(() => startOverlay.style.display = "none", 500); // fade out smoothly
+  unlockMusic();
+  story();
+});
+
+/* GLOBAL CLICK TO SLAP (ONLY IF STORY IS DONE) */
 document.body.addEventListener("click",(e)=>{
-  if(e.target.tagName!=="BUTTON"){
+  if(e.target.tagName!=="BUTTON" && e.target.id!=="start-overlay" && active){
     slap(e);
   }
 });
