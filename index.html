@@ -6,24 +6,24 @@
 <title>For You ❤️</title>
 
 <style>
-body{
-  margin:0;
-  overflow:hidden;
-  font-family:sans-serif;
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
   background: radial-gradient(circle at center, #ffdce5, #f8bbd0);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  transition:1s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: 1s;
 }
 
-body.sad-mode{
+body.sad-mode {
   background: radial-gradient(circle at center, #444, #111);
 }
 
-#scene{
-  text-align:center;
+#scene {
+  text-align: center;
 }
 
 /* START OVERLAY TO UNLOCK MUSIC */
@@ -46,107 +46,107 @@ body.sad-mode{
 }
 
 /* BUBBLE */
-#bubble{
-  opacity:0;
-  background:white;
-  padding:16px 26px;
-  border-radius:22px;
-  margin-bottom:20px;
-  font-size:1.2rem;
-  max-width:320px;
-  min-height:60px;
-  line-height:1.5;
-  letter-spacing:0.3px;
+#bubble {
+  opacity: 0;
+  background: white;
+  padding: 16px 26px;
+  border-radius: 22px;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  max-width: 320px;
+  min-height: 60px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
 }
 
 /* HEAD */
-#head{
-  width:170px;
-  height:170px;
-  border-radius:50%;
-  overflow:hidden;
+#head {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  overflow: hidden;
 
   /* HAPPY FACE (CROPPED) */
-  background-image:url("Rohit.jpeg");
-  background-size:260%;
-  background-position:55% 25%;
+  background-image: url("Rohit.jpeg");
+  background-size: 260%;
+  background-position: 55% 25%;
   background-color: #ddd; /* Fallback color */
 
-  border:5px solid white;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  border: 5px solid white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 
-  animation:idle 5s infinite ease-in-out;
+  animation: idle 5s infinite ease-in-out;
 }
 
 /* SAD FACE (FULL IMAGE, NO CROP) */
-#head.sad{
-  background-image:url("Rohit_sad.jpeg");
-  background-size:cover;     /* FULL FACE */
-  background-position:center;
+#head.sad {
+  background-image: url("Rohit_sad.jpeg");
+  background-size: cover;     /* FULL FACE */
+  background-position: center;
   filter: grayscale(20%) brightness(0.9);
 }
 
-@keyframes idle{
-  0%,100%{transform:rotate(0deg);}
-  50%{transform:rotate(2deg);}
+@keyframes idle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(2deg); }
 }
 
 /* BODY */
-#body{
-  width:180px;
-  height:100px;
-  background:#2f2f2f;
-  border-radius:30px;
-  margin:auto;
-  margin-top:-30px;
+#body {
+  width: 180px;
+  height: 100px;
+  background: #2f2f2f;
+  border-radius: 30px;
+  margin: auto;
+  margin-top: -30px;
 }
 
 /* UI */
-#ui{
-  margin-top:25px;
-  opacity:0;
-  pointer-events:none;
-  transition:0.5s;
+#ui {
+  margin-top: 25px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.5s;
 }
-#ui.active{
-  opacity:1;
-  pointer-events:auto;
+#ui.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-button{
-  padding:12px 22px;
-  border:none;
-  border-radius:50px;
-  margin:5px;
-  cursor:pointer;
+button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 50px;
+  margin: 5px;
+  cursor: pointer;
   font-size: 1rem;
 }
 
 /* ANIMATIONS */
-.head-slap{ animation:slap 0.4s; }
-@keyframes slap{
-  30%{transform:rotate(-25deg);}
-  60%{transform:rotate(20deg);}
+.head-slap { animation: slap 0.4s; }
+@keyframes slap {
+  30% { transform: rotate(-25deg); }
+  60% { transform: rotate(20deg); }
 }
 
-.head-kiss{ animation:kiss 0.4s; }
-@keyframes kiss{
-  50%{transform:scale(1.15);}
+.head-kiss { animation: kiss 0.4s; }
+@keyframes kiss {
+  50% { transform: scale(1.15); }
 }
 
-.glow{
-  box-shadow:0 0 40px #ff4081;
+.glow {
+  box-shadow: 0 0 40px #ff4081;
 }
 
 /* HEARTS */
-.heart{
-  position:absolute;
-  font-size:22px;
-  pointer-events:none;
-  animation:rise 1.2s forwards;
+.heart {
+  position: absolute;
+  font-size: 22px;
+  pointer-events: none;
+  animation: rise 1.2s forwards;
 }
-@keyframes rise{
-  to{opacity:0; transform:translateY(-140px);}
+@keyframes rise {
+  to { opacity: 0; transform: translateY(-140px); }
 }
 </style>
 </head>
@@ -178,98 +178,87 @@ button{
 </div>
 
 <script>
-
 const bubble = document.getElementById("bubble");
 const head = document.getElementById("head");
 const ui = document.getElementById("ui");
 const music = document.getElementById("music");
 const startOverlay = document.getElementById("start-overlay");
 
-let slaps=0, kisses=0, active=false;
-let typingTimer=null;
+let slaps = 0, kisses = 0, active = false;
+let typingTimer = null;
 let storyRunning = true;
 
-/* FIXED TYPEWRITER (USES textContent INSTEAD OF innerText) */
-function typeText(text, speed=35){
+/* FIXED TYPEWRITER (USES textContent TO PREVENT SPACING BUGS) */
+function typeText(text, speed = 35) {
   clearInterval(typingTimer);
-  bubble.textContent=""; // Fixes the missing space bug
-  bubble.style.opacity=1;
+  bubble.textContent = ""; 
+  bubble.style.opacity = 1;
 
-  let i=0;
-  typingTimer=setInterval(()=>{
+  let i = 0;
+  typingTimer = setInterval(() => {
     bubble.textContent += text.charAt(i); 
     i++;
-    if(i>=text.length){
+    if (i >= text.length) {
       clearInterval(typingTimer);
     }
   }, speed);
 }
 
-/* PERFECT MUSIC UNLOCK */
-function unlockMusic(){
-  music.volume = 0;
+/* INSTANT MUSIC PLAY (NO FADE IN) */
+function unlockMusic() {
+  music.volume = 1.0; // Sets volume to 100% immediately
   let playPromise = music.play();
 
-  if(playPromise !== undefined){
-    playPromise.then(()=>{
-      let v=0;
-      let fade=setInterval(()=>{
-        if(v>=0.4){
-          clearInterval(fade);
-        } else {
-          v+=0.02;
-          music.volume=v;
-        }
-      },200);
-    }).catch((error)=>{
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
       console.log("Audio failed to play:", error);
     });
   }
 }
 
 /* STORY */
-async function story(){
+async function story() {
   await delay(1000);
-  if(!storyRunning) return;
+  if (!storyRunning) return;
   typeText("I didn’t handle things right...");
 
   await delay(3000);
-  if(!storyRunning) return;
+  if (!storyRunning) return;
   typeText("And I know I hurt you.");
 
   await delay(3000);
-  if(!storyRunning) return;
+  if (!storyRunning) return;
   typeText("You don’t have to forgive me...");
 
   await delay(3000);
-  if(!storyRunning) return;
+  if (!storyRunning) return;
   typeText("But I wanted to try...");
 
   await delay(3000);
-  if(!storyRunning) return;
+  if (!storyRunning) return;
   typeText("React however you feel.");
 
   ui.classList.add("active");
-  active=true;
+  active = true;
   storyRunning = false;
 }
 
-function delay(ms){
-  return new Promise(r=>setTimeout(r,ms));
+function delay(ms) {
+  return new Promise(r => setTimeout(r, ms));
 }
 
 /* ANIMATION RESET HELPER */
 function triggerAnimation(animClass) {
   head.classList.remove("head-slap", "head-kiss");
-  void head.offsetWidth; // Forces the browser to reset the animation
+  void head.offsetWidth; // Forces the browser to reset the animation instantly
   head.classList.add(animClass);
 }
 
 /* ACTIONS */
-function slap(e){
+function slap(e) {
   e?.stopPropagation();
 
-  if(!active){
+  if (!active) {
     typeText("Wait… please listen first.");
     return;
   }
@@ -279,7 +268,7 @@ function slap(e){
   triggerAnimation("head-slap");
   head.classList.add("sad");
 
-  if(slaps<3){
+  if (slaps < 3) {
     typeText("...yeah, I deserve that.");
   } else {
     typeText("I really messed up, didn’t I?");
@@ -288,10 +277,10 @@ function slap(e){
   checkEnd();
 }
 
-function kiss(e){
+function kiss(e) {
   e?.stopPropagation();
 
-  if(!active){
+  if (!active) {
     typeText("Wait… please listen first.");
     return;
   }
@@ -303,7 +292,7 @@ function kiss(e){
 
   spawnHearts();
 
-  if(kisses<3){
+  if (kisses < 3) {
     typeText("You’re kinder than I deserve...");
   } else {
     typeText("Why are you so good to me? 💖");
@@ -313,28 +302,28 @@ function kiss(e){
 }
 
 /* HEARTS */
-function spawnHearts(){
-  for(let i=0;i<5;i++){
-    let h=document.createElement("div");
-    h.className="heart";
-    h.innerText="💖";
+function spawnHearts() {
+  for (let i = 0; i < 5; i++) {
+    let h = document.createElement("div");
+    h.className = "heart";
+    h.innerText = "💖";
 
-    h.style.left=(window.innerWidth/2 + Math.random()*120-60)+"px";
-    h.style.top=(window.innerHeight/2)+"px";
+    h.style.left = (window.innerWidth / 2 + Math.random() * 120 - 60) + "px";
+    h.style.top = (window.innerHeight / 2) + "px";
 
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(),1200);
+    setTimeout(() => h.remove(), 1200);
   }
 }
 
 /* ENDING */
-function checkEnd(){
-  if(slaps>=6 || kisses>=6){
-    active=false;
-    ui.style.opacity=0;
+function checkEnd() {
+  if (slaps >= 6 || kisses >= 6) {
+    active = false;
+    ui.style.opacity = 0;
 
-    setTimeout(()=>{
-      if(kisses>slaps){
+    setTimeout(() => {
+      if (kisses > slaps) {
         typeText("I love you ❤️");
         head.classList.remove("sad");
         head.classList.add("glow");
@@ -343,7 +332,7 @@ function checkEnd(){
         typeText("I’ll fix myself… I promise.");
         document.body.classList.add("sad-mode");
       }
-    },1000);
+    }, 1000);
   }
 }
 
@@ -351,17 +340,17 @@ function checkEnd(){
 document.getElementById("slap").addEventListener("click", slap);
 document.getElementById("kiss").addEventListener("click", kiss);
 
-/* START BUTTON LISTENER (FIXES MUSIC) */
+/* START BUTTON LISTENER (TRIGGERS INSTANT MUSIC & STORY) */
 startOverlay.addEventListener("click", () => {
   startOverlay.style.opacity = "0";
-  setTimeout(() => startOverlay.style.display = "none", 500); // fade out smoothly
+  setTimeout(() => startOverlay.style.display = "none", 500); // fade out overlay smoothly
   unlockMusic();
   story();
 });
 
 /* GLOBAL CLICK TO SLAP (ONLY IF STORY IS DONE) */
-document.body.addEventListener("click",(e)=>{
-  if(e.target.tagName!=="BUTTON" && e.target.id!=="start-overlay" && active){
+document.body.addEventListener("click", (e) => {
+  if (e.target.tagName !== "BUTTON" && e.target.id !== "start-overlay" && active) {
     slap(e);
   }
 });
@@ -369,4 +358,4 @@ document.body.addEventListener("click",(e)=>{
 </script>
 
 </body>
-</html> 
+</html>
