@@ -157,9 +157,7 @@ button {
 <div id="start-overlay">Tap anywhere to start ❤️</div>
 
 <!-- MUSIC -->
-<audio id="music" loop preload="auto">
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
+<audio id="music" src="music.mp3" loop preload="auto"></audio>
 
 <div id="scene">
 
@@ -187,8 +185,9 @@ const startOverlay = document.getElementById("start-overlay");
 let slaps = 0, kisses = 0, active = false;
 let typingTimer = null;
 let storyRunning = true;
+let musicStarted = false; // Tracks if music is already playing
 
-/* FIXED TYPEWRITER (USES textContent TO PREVENT SPACING BUGS) */
+/* TYPEWRITER (USES textContent TO PREVENT SPACING BUGS) */
 function typeText(text, speed = 35) {
   clearInterval(typingTimer);
   bubble.textContent = ""; 
@@ -204,14 +203,27 @@ function typeText(text, speed = 35) {
   }, speed);
 }
 
-/* INSTANT MUSIC PLAY (NO FADE IN) */
-function unlockMusic() {
-  music.volume = 1.0; // Sets volume to 100% immediately
+/* FADE-IN MUSIC FUNCTION */
+function playMusicWithFade() {
+  if (musicStarted) return; // Prevent restarting if they click kiss multiple times
+  musicStarted = true;
+
+  music.volume = 0; // Start at 0
   let playPromise = music.play();
 
   if (playPromise !== undefined) {
-    playPromise.catch((error) => {
-      console.log("Audio failed to play:", error);
+    playPromise.then(() => {
+      let v = 0;
+      let fade = setInterval(() => {
+        if (v >= 0.6) { // Stops fading at 60% volume
+          clearInterval(fade);
+        } else {
+          v += 0.02;
+          music.volume = v;
+        }
+      }, 100); // Increases volume smoothly
+    }).catch((error) => {
+      console.log("Audio failed to fade in:", error);
     });
   }
 }
@@ -290,6 +302,9 @@ function kiss(e) {
   triggerAnimation("head-kiss");
   head.classList.remove("sad");
 
+  // TRIGGER THE MUSIC FADE-IN HERE
+  playMusicWithFade();
+  
   spawnHearts();
 
   if (kisses < 3) {
@@ -340,11 +355,17 @@ function checkEnd() {
 document.getElementById("slap").addEventListener("click", slap);
 document.getElementById("kiss").addEventListener("click", kiss);
 
-/* START BUTTON LISTENER (TRIGGERS INSTANT MUSIC & STORY) */
+/* START BUTTON LISTENER */
 startOverlay.addEventListener("click", () => {
+  // Prime the audio silently so mobile browsers allow it to play later
+  music.volume = 0;
+  music.play().then(() => {
+    music.pause();
+    music.currentTime = 0;
+  }).catch(() => {});
+
   startOverlay.style.opacity = "0";
   setTimeout(() => startOverlay.style.display = "none", 500); // fade out overlay smoothly
-  unlockMusic();
   story();
 });
 
