@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>For You ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Apology</title>
 
 <style>
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
-  font-family: 'Segoe UI', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  background-color: #fce4ec;
+  font-family: 'Segoe UI';
+  overflow: hidden;
 }
 
-/* Scene */
 #scene {
+  position: relative;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -28,214 +28,295 @@ body, html {
   justify-content: center;
 }
 
-/* Bubble */
+/* SPEECH */
 #bubble {
   opacity: 0;
-  background: rgba(255,255,255,0.95);
-  padding: 18px 28px;
-  border-radius: 25px;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #444;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  margin-bottom: 25px;
-  transition: all 0.6s ease;
-  text-align: center;
+  background: white;
+  padding: 15px 25px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: 0.5s;
+  margin-bottom: 20px;
 }
 
-/* Character */
+/* CHARACTER */
 #character-container {
-  transition: transform 1s ease;
+  position: relative;
+  transition: 1s;
+}
+
+#character {
+  position: relative;
+  width: 140px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: breathe 3s infinite ease-in-out;
+}
+
+/* HEAD */
+.head {
+  width: 90px;
+  height: 90px;
+  background: #d6a77a; /* 🔥 CHANGE SKIN */
+  border-radius: 50%;
   position: relative;
 }
 
-.bowing { transform: rotate(-15deg) translateY(20px); }
-.sitting { transform: translateY(60px); }
+/* HAIR */
+.hair {
+  position: absolute;
+  top: -10px;
+  width: 100%;
+  height: 50px;
+  background: black; /* 🔥 CHANGE HAIR */
+  border-radius: 50% 50% 0 0;
+}
 
-/* Avatar (FIXED IMAGE HERE) */
-#character {
-  width: 180px;
-  height: 180px;
+/* EYES */
+.eyes {
+  position: absolute;
+  top: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.eye {
+  width: 10px;
+  height: 10px;
+  background: black;
   border-radius: 50%;
-  background-image: url('Rohit.png'); /* ✅ FIXED */
-  background-size: cover;
-  background-position: center top;
-  border: 5px solid white;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-  animation: float 3s ease-in-out infinite;
+  animation: blink 4s infinite;
 }
 
-/* Floating */
-@keyframes float {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* MOUTH */
+.mouth {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  width: 25px;
+  height: 10px;
+  border-bottom: 3px solid black;
+  transform: translateX(-50%);
 }
 
-/* Chair */
+/* BEARD */
+.beard {
+  position: absolute;
+  bottom: 5px;
+  width: 60%;
+  height: 20px;
+  background: #3e2723; /* 🔥 CHANGE BEARD */
+  border-radius: 50%;
+}
+
+/* BODY */
+.body {
+  width: 80px;
+  height: 90px;
+  background: #90caf9;
+  border-radius: 20px;
+  margin-top: -10px;
+}
+
+/* CHAIR */
 #chair {
   font-size: 100px;
   position: absolute;
   bottom: -40px;
   opacity: 0;
-  transition: opacity 1s ease;
+  transition: 1s;
 }
 
 /* UI */
 #ui {
   opacity: 0;
-  margin-top: 40px;
-  transition: opacity 0.5s ease;
+  pointer-events: none;
+  margin-top: 50px;
+  text-align: center;
+  transition: 0.5s;
 }
 
-#ui.active { opacity: 1; }
+#ui.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 button {
-  padding: 16px 28px;
-  margin: 10px;
-  border: none;
+  padding: 12px 20px;
   border-radius: 50px;
-  font-size: 1.2rem;
-  cursor: pointer;
+  border: none;
   font-weight: bold;
-  transition: 0.2s;
+  cursor: pointer;
+  margin: 5px;
 }
 
-button:active { transform: scale(0.9); }
+#btn-slap { background: orange; }
+#btn-kiss { background: pink; }
 
-#btn-slap { background: #ffccbc; }
-#btn-kiss { background: #f48fb1; }
+/* ANIMATIONS */
+@keyframes blink {
+  0%, 90%, 100% { height: 10px; }
+  95% { height: 2px; }
+}
 
-/* Animations */
-.slap { animation: slapAnim 0.4s ease; }
-@keyframes slapAnim {
+@keyframes breathe {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.slapped {
+  animation: slap 0.4s;
+}
+
+@keyframes slap {
   0% { transform: translateX(0); }
-  30% { transform: translateX(-20px); }
-  60% { transform: translateX(15px); }
+  25% { transform: translateX(-20px) rotate(-8deg); }
+  50% { transform: translateX(20px) rotate(8deg); }
   100% { transform: translateX(0); }
 }
 
-.kiss { animation: kissAnim 0.5s ease; }
-@keyframes kissAnim {
+.kissed {
+  animation: kiss 0.5s;
+}
+
+@keyframes kiss {
   0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
 
-/* Hearts */
-.heart {
+/* HEARTS */
+.kissed::after {
+  content: "❤️ ❤️ ❤️";
   position: absolute;
-  font-size: 22px;
-  animation: rise 1.2s ease forwards;
-}
-@keyframes rise {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-120px); }
+  top: -30px;
+  font-size: 18px;
+  animation: float 1s forwards;
 }
 
-/* Glow */
-.glow {
-  animation: glow 1s ease infinite alternate;
+@keyframes float {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
 }
-@keyframes glow {
-  0% { box-shadow: 0 0 10px pink; }
-  100% { box-shadow: 0 0 40px #ff4081; }
+
+/* STATES */
+.bowing { transform: rotate(-20deg); }
+.sitting { transform: translateY(60px); }
+
+#tap-zone {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 </style>
 </head>
 
 <body>
 
+<div id="tap-zone"></div>
+
 <div id="scene">
-  <div id="bubble">Hey… can we talk?</div>
 
-  <div id="character-container">
-    <div id="character"></div>
-    <div id="chair">🪑</div>
-  </div>
+<div id="bubble">I'm really sorry for yesterday</div>
 
-  <div id="ui">
-    <button id="btn-slap">👋 Slap</button>
-    <button id="btn-kiss">💋 Kiss</button>
+<div id="character-container">
+  <div id="character">
+    <div class="head">
+      <div class="hair"></div>
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
+      <div class="mouth"></div>
+      <div class="beard"></div>
+    </div>
+    <div class="body"></div>
   </div>
+  <div id="chair">🪑</div>
+</div>
+
+<div id="ui">
+  <div>
+    Slaps: <span id="count-slap">0</span> |
+    Kisses: <span id="count-kiss">0</span>
+  </div>
+  <button id="btn-slap">👋 Slap</button>
+  <button id="btn-kiss">💋 Kiss</button>
+</div>
+
 </div>
 
 <script>
-let slaps = 0;
-let kisses = 0;
-const max = 8;
+let slaps = 0, kisses = 0;
+const max = 10;
+let phase = 'intro';
 
-const bubble = document.getElementById("bubble");
-const character = document.getElementById("character");
-const container = document.getElementById("character-container");
-const chair = document.getElementById("chair");
-const ui = document.getElementById("ui");
-
-/* Intro */
-setTimeout(()=>{
-  container.classList.add("bowing");
-  bubble.innerText="I'm really sorry...";
-  bubble.style.opacity=1;
-},1000);
+const bubble = document.getElementById('bubble');
+const charContainer = document.getElementById('character-container');
+const character = document.getElementById('character');
+const chair = document.getElementById('chair');
+const ui = document.getElementById('ui');
 
 setTimeout(()=>{
-  container.classList.remove("bowing");
-  container.classList.add("sitting");
-  chair.style.opacity=1;
-  bubble.innerText="I didn't mean to hurt you ❤️";
-},3000);
+  charContainer.classList.add('bowing');
+  bubble.style.opacity = 1;
 
-setTimeout(()=>{
-  ui.classList.add("active");
-},4500);
+  setTimeout(()=>{
+    charContainer.classList.remove('bowing');
+    charContainer.classList.add('sitting');
+    bubble.style.opacity = 0;
+    chair.style.opacity = 1;
 
-/* Actions */
-document.getElementById("btn-slap").onclick=()=>{
-  slaps++;
-  animate("slap");
-  bubble.innerText="Okay… I deserve that 😔";
-  endCheck();
-};
-
-document.getElementById("btn-kiss").onclick=()=>{
-  kisses++;
-  animate("kiss");
-  spawnHearts();
-  bubble.innerText="Thank you… that means a lot 💖";
-  endCheck();
-};
-
-function animate(type){
-  character.classList.remove("slap","kiss");
-  void character.offsetWidth;
-  character.classList.add(type);
-}
-
-/* Hearts */
-function spawnHearts(){
-  for(let i=0;i<4;i++){
-    let h=document.createElement("div");
-    h.className="heart";
-    h.innerText="💖";
-    h.style.left=(window.innerWidth/2 + Math.random()*80-40)+"px";
-    h.style.top=(window.innerHeight/2)+"px";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),1200);
-  }
-}
-
-/* End */
-function endCheck(){
-  if(slaps>=max || kisses>=max){
-    ui.style.display="none";
     setTimeout(()=>{
-      container.classList.remove("sitting");
+      ui.classList.add('active');
+      phase='interaction';
+    },1000);
+
+  },3000);
+},500);
+
+function slap(){
+  if(phase!=='interaction') return;
+  slaps++;
+  document.getElementById('count-slap').innerText=slaps;
+  animate('slapped');
+  check();
+}
+
+function kiss(){
+  if(phase!=='interaction') return;
+  kisses++;
+  document.getElementById('count-kiss').innerText=kisses;
+  animate('kissed');
+  check();
+}
+
+function animate(cls){
+  character.classList.remove('slapped','kissed');
+  void character.offsetWidth;
+  character.classList.add(cls);
+}
+
+function check(){
+  if(slaps>=max || kisses>=max){
+    phase='end';
+    ui.classList.remove('active');
+
+    setTimeout(()=>{
+      charContainer.classList.remove('sitting');
       chair.style.opacity=0;
       bubble.innerText="I love u ❤️";
-      character.classList.add("glow");
-      spawnHearts();
-    },800);
+      bubble.style.opacity=1;
+    },500);
   }
 }
+
+document.getElementById('btn-slap').onclick=slap;
+document.getElementById('btn-kiss').onclick=kiss;
+document.getElementById('tap-zone').onclick=slap;
 </script>
 
 </body>
