@@ -4,320 +4,290 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive Apology</title>
-
 <style>
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fce4ec;
-  font-family: 'Segoe UI';
-  overflow: hidden;
-}
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fce4ec; /* Soft warm background */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+  }
 
-#scene {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+  #scene {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
-/* SPEECH */
-#bubble {
-  opacity: 0;
-  background: white;
-  padding: 15px 25px;
-  border-radius: 20px;
-  font-weight: bold;
-  transition: 0.5s;
-  margin-bottom: 20px;
-}
+  /* Speech Bubble */
+  #bubble {
+    opacity: 0;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    transition: opacity 0.5s ease;
+    position: relative;
+  }
+  #bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+  }
 
-/* CHARACTER */
-#character-container {
-  position: relative;
-  transition: 1s;
-}
+  /* Character */
+  #character-container {
+    position: relative;
+    z-index: 10;
+    transition: transform 1s ease;
+  }
 
-#character {
-  position: relative;
-  width: 140px;
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: breathe 3s infinite ease-in-out;
-}
+  #character {
+    width: 150px;
+    height: 200px;
+    background-color: #d7ccc8; /* Fallback color */
+    border-radius: 75px 75px 20px 20px;
+    
+    /* ADD YOUR STYLIZED AVATAR IMAGE HERE */
+    background-image: url('PLACE_YOUR_AVATAR_IMAGE_URL_HERE.png'); 
+    
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5d4037;
+    text-align: center;
+    border: 4px solid #fff;
+  }
 
-/* HEAD */
-.head {
-  width: 90px;
-  height: 90px;
-  background: #d6a77a; /* 🔥 CHANGE SKIN */
-  border-radius: 50%;
-  position: relative;
-}
+  /* Chair */
+  #chair {
+    font-size: 100px;
+    position: absolute;
+    bottom: -40px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
 
-/* HAIR */
-.hair {
-  position: absolute;
-  top: -10px;
-  width: 100%;
-  height: 50px;
-  background: black; /* 🔥 CHANGE HAIR */
-  border-radius: 50% 50% 0 0;
-}
+  /* UI Controls */
+  #ui {
+    opacity: 0;
+    pointer-events: none;
+    margin-top: 50px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+    z-index: 20;
+  }
+  #ui.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-/* EYES */
-.eyes {
-  position: absolute;
-  top: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-}
+  .counters {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  .counters span {
+    margin: 0 15px;
+  }
 
-.eye {
-  width: 10px;
-  height: 10px;
-  background: black;
-  border-radius: 50%;
-  animation: blink 4s infinite;
-}
+  button {
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  #btn-slap { background-color: #ffcc80; color: #d84315; }
+  #btn-kiss { background-color: #f48fb1; color: #880e4f; }
 
-/* MOUTH */
-.mouth {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  width: 25px;
-  height: 10px;
-  border-bottom: 3px solid black;
-  transform: translateX(-50%);
-}
+  /* Animations */
+  .bowing {
+    transform: rotate(-25deg) translateY(20px);
+  }
+  .sitting {
+    transform: translateY(60px);
+  }
+  .slapped {
+    animation: shake 0.3s ease;
+  }
+  .kissed {
+    animation: pulse 0.4s ease;
+  }
 
-/* BEARD */
-.beard {
-  position: absolute;
-  bottom: 5px;
-  width: 60%;
-  height: 20px;
-  background: #3e2723; /* 🔥 CHANGE BEARD */
-  border-radius: 50%;
-}
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-15px) rotate(-5deg); }
+    50% { transform: translateX(15px) rotate(5deg); }
+    75% { transform: translateX(-15px) rotate(-5deg); }
+    100% { transform: translateX(0); }
+  }
 
-/* BODY */
-.body {
-  width: 80px;
-  height: 90px;
-  background: #90caf9;
-  border-radius: 20px;
-  margin-top: -10px;
-}
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
 
-/* CHAIR */
-#chair {
-  font-size: 100px;
-  position: absolute;
-  bottom: -40px;
-  opacity: 0;
-  transition: 1s;
-}
-
-/* UI */
-#ui {
-  opacity: 0;
-  pointer-events: none;
-  margin-top: 50px;
-  text-align: center;
-  transition: 0.5s;
-}
-
-#ui.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-button {
-  padding: 12px 20px;
-  border-radius: 50px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 5px;
-}
-
-#btn-slap { background: orange; }
-#btn-kiss { background: pink; }
-
-/* ANIMATIONS */
-@keyframes blink {
-  0%, 90%, 100% { height: 10px; }
-  95% { height: 2px; }
-}
-
-@keyframes breathe {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.slapped {
-  animation: slap 0.4s;
-}
-
-@keyframes slap {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-20px) rotate(-8deg); }
-  50% { transform: translateX(20px) rotate(8deg); }
-  100% { transform: translateX(0); }
-}
-
-.kissed {
-  animation: kiss 0.5s;
-}
-
-@keyframes kiss {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-/* HEARTS */
-.kissed::after {
-  content: "❤️ ❤️ ❤️";
-  position: absolute;
-  top: -30px;
-  font-size: 18px;
-  animation: float 1s forwards;
-}
-
-@keyframes float {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-40px); }
-}
-
-/* STATES */
-.bowing { transform: rotate(-20deg); }
-.sitting { transform: translateY(60px); }
-
-#tap-zone {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+  /* Background screen tap area */
+  #tap-zone {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+  }
 </style>
 </head>
-
 <body>
 
+<!-- Invisible full-screen layer to detect screen taps for slaps -->
 <div id="tap-zone"></div>
 
 <div id="scene">
+  <div id="bubble">I'm really sorry for yesterday</div>
+  
+  <div id="character-container" class="standing">
+    <div id="character">Avatar Image<br>Goes Here</div>
+    <div id="chair">🪑</div>
+  </div>
 
-<div id="bubble">I'm really sorry for yesterday</div>
-
-<div id="character-container">
-  <div id="character">
-    <div class="head">
-      <div class="hair"></div>
-      <div class="eyes">
-        <div class="eye"></div>
-        <div class="eye"></div>
-      </div>
-      <div class="mouth"></div>
-      <div class="beard"></div>
+  <div id="ui">
+    <div class="counters">
+      <span>Slaps: <span id="count-slap">0</span></span>
+      <span>Kisses: <span id="count-kiss">0</span></span>
     </div>
-    <div class="body"></div>
+    <div class="buttons">
+      <button id="btn-slap">👋 Slap</button>
+      <button id="btn-kiss">💋 Kiss</button>
+    </div>
   </div>
-  <div id="chair">🪑</div>
-</div>
-
-<div id="ui">
-  <div>
-    Slaps: <span id="count-slap">0</span> |
-    Kisses: <span id="count-kiss">0</span>
-  </div>
-  <button id="btn-slap">👋 Slap</button>
-  <button id="btn-kiss">💋 Kiss</button>
-</div>
-
 </div>
 
 <script>
-let slaps = 0, kisses = 0;
-const max = 10;
-let phase = 'intro';
+  let slaps = 0;
+  let kisses = 0;
+  const maxActions = 10;
+  let phase = 'intro'; // phases: intro, interaction, end
 
-const bubble = document.getElementById('bubble');
-const charContainer = document.getElementById('character-container');
-const character = document.getElementById('character');
-const chair = document.getElementById('chair');
-const ui = document.getElementById('ui');
+  const bubble = document.getElementById('bubble');
+  const charContainer = document.getElementById('character-container');
+  const character = document.getElementById('character');
+  const chair = document.getElementById('chair');
+  const ui = document.getElementById('ui');
+  const tapZone = document.getElementById('tap-zone');
+  
+  const slapsDisplay = document.getElementById('count-slap');
+  const kissesDisplay = document.getElementById('count-kiss');
+  const btnSlap = document.getElementById('btn-slap');
+  const btnKiss = document.getElementById('btn-kiss');
 
-setTimeout(()=>{
-  charContainer.classList.add('bowing');
-  bubble.style.opacity = 1;
+  // Initial Sequence: Bow, apologize, then sit down
+  setTimeout(() => {
+    // Character bows and text bubble appears
+    charContainer.classList.add('bowing');
+    bubble.style.opacity = 1;
 
-  setTimeout(()=>{
-    charContainer.classList.remove('bowing');
-    charContainer.classList.add('sitting');
-    bubble.style.opacity = 0;
-    chair.style.opacity = 1;
+    setTimeout(() => {
+      // After 3 seconds, stop bowing, sit down, show chair and UI
+      charContainer.classList.remove('bowing');
+      charContainer.classList.add('sitting');
+      bubble.style.opacity = 0;
+      chair.style.opacity = 1;
+      
+      // Delay UI appearance slightly after sitting
+      setTimeout(() => {
+        ui.classList.add('active');
+        phase = 'interaction';
+      }, 1000);
 
-    setTimeout(()=>{
-      ui.classList.add('active');
-      phase='interaction';
-    },1000);
+    }, 3000);
+  }, 500);
 
-  },3000);
-},500);
-
-function slap(){
-  if(phase!=='interaction') return;
-  slaps++;
-  document.getElementById('count-slap').innerText=slaps;
-  animate('slapped');
-  check();
-}
-
-function kiss(){
-  if(phase!=='interaction') return;
-  kisses++;
-  document.getElementById('count-kiss').innerText=kisses;
-  animate('kissed');
-  check();
-}
-
-function animate(cls){
-  character.classList.remove('slapped','kissed');
-  void character.offsetWidth;
-  character.classList.add(cls);
-}
-
-function check(){
-  if(slaps>=max || kisses>=max){
-    phase='end';
-    ui.classList.remove('active');
-
-    setTimeout(()=>{
-      charContainer.classList.remove('sitting');
-      chair.style.opacity=0;
-      bubble.innerText="I love u ❤️";
-      bubble.style.opacity=1;
-    },500);
+  // Interaction Logic
+  function doSlap() {
+    if (phase !== 'interaction') return;
+    slaps++;
+    slapsDisplay.innerText = slaps;
+    triggerAnimation('slapped');
+    checkEndCondition();
   }
-}
 
-document.getElementById('btn-slap').onclick=slap;
-document.getElementById('btn-kiss').onclick=kiss;
-document.getElementById('tap-zone').onclick=slap;
+  function doKiss() {
+    if (phase !== 'interaction') return;
+    kisses++;
+    kissesDisplay.innerText = kisses;
+    triggerAnimation('kissed');
+    checkEndCondition();
+  }
+
+  function triggerAnimation(animClass) {
+    character.classList.remove('slapped', 'kissed');
+    // Force a browser reflow to instantly restart the animation
+    void character.offsetWidth;
+    character.classList.add(animClass);
+  }
+
+  function checkEndCondition() {
+    // When either counter reaches 10, trigger the final state
+    if (slaps >= maxActions || kisses >= maxActions) {
+      phase = 'end';
+      ui.classList.remove('active'); // Hide buttons and counters
+      
+      setTimeout(() => {
+        // Character stands back up and delivers final message
+        charContainer.classList.remove('sitting');
+        chair.style.opacity = 0;
+        bubble.innerText = "I love u ❤️";
+        bubble.style.opacity = 1;
+      }, 500);
+    }
+  }
+
+  // Event Listeners for buttons
+  btnSlap.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevents the tapZone background from firing too
+    doSlap();
+  });
+
+  btnKiss.addEventListener('click', (e) => {
+    e.stopPropagation();
+    doKiss();
+  });
+
+  // Tapping anywhere on the screen background triggers a slap
+  tapZone.addEventListener('click', () => {
+    doSlap();
+  });
+
 </script>
-
 </body>
 </html>
