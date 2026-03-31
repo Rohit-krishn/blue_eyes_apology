@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>For You ❤️</title>
+
+<style>
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Invisible full-screen layer for tapping */
+#tap-zone {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1;
+}
+
+/* Scene */
+#scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+/* Bubble */
+#bubble {
+  opacity: 0;
+  background: rgba(255,255,255,0.95);
+  padding: 18px 28px;
+  border-radius: 25px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #444;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+  transition: all 0.6s ease;
+  text-align: center;
+  max-width: 80%;
+}
+
+/* Character Container (Handles Sitting/Standing/Bowing) */
+#character-container {
+  position: relative;
+  transition: transform 1s ease;
+  display: flex;
+  justify-content: center;
+}
+
+.bowing { transform: rotate(-20deg) translateY(20px); }
+.sitting { transform: translateY(60px); }
+
+/* Character (Handles Floating & Image) */
+#character {
+  width: 160px;
+  height: 210px;
+  border-radius: 80px 80px 30px 30px;
+  
+  /* PUT YOUR IMAGE FILENAME HERE */
+  background-image: url('my-photo.png'); 
+  
+  background-size: cover;
+  background-position: center;
+  border: 4px solid white;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  animation: float 3s ease-in-out infinite;
+  z-index: 10;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Chair */
+#chair {
+  font-size: 110px;
+  position: absolute;
+  bottom: -40px;
+  z-index: -1; /* Keeps chair behind the character */
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+/* UI */
+#ui {
+  opacity: 0;
+  pointer-events: none;
+  margin-top: 50px;
+  transition: opacity 0.6s ease;
+  z-index: 20;
+}
+
+#ui.active { 
+  opacity: 1; 
+  pointer-events: auto;
+}
+
+button {
+  padding: 16px 28px;
+  margin: 10px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+button:active { transform: scale(0.9); }
+
+#btn-slap { background: #ffccbc; color: #d84315; }
+#btn-kiss { background: #f48fb1; color: #880e4f; }
+
+/* Animations */
+.slap { animation: slapAnim 0.4s ease; }
+@keyframes slapAnim {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-20px) rotate(-5deg); }
+  60% { transform: translateX(15px) rotate(5deg); }
+  100% { transform: translateX(0); }
+}
+
+.kiss { animation: kissAnim 0.5s ease; }
+@keyframes kissAnim {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Hearts */
+.heart {
+  position: absolute;
+  font-size: 24px;
+  animation: rise 1.2s ease forwards;
+  z-index: 15;
+  pointer-events: none;
+}
+@keyframes rise {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
+}
+
+/* Glow effect */
+.glow {
+  animation: glow 1.5s ease infinite alternate;
+}
+@keyframes glow {
+  0% { box-shadow: 0 0 10px pink, 0 15px 35px rgba(0,0,0,0.25); }
+  100% { box-shadow: 0 0 40px #ff4081, 0 15px 35px rgba(0,0,0,0.25); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="tap-zone"></div>
+
+<div id="scene">
+  <div id="bubble">Hey… can we talk?</div>
+
+  <div id="character-container">
+    <div id="character"></div>
+    <div id="chair">🪑</div>
+  </div>
+
+  <div id="ui">
+    <button id="btn-slap">👋 Slap</button>
+    <button id="btn-kiss">💋 Kiss</button>
+  </div>
+</div>
+
+<script>
+let slaps = 0;
+let kisses = 0;
+const max = 10;
+let isActive = false;
+
+const bubble = document.getElementById("bubble");
+const character = document.getElementById("character");
+const charContainer = document.getElementById("character-container");
+const chair = document.getElementById("chair");
+const ui = document.getElementById("ui");
+const tapZone = document.getElementById("tap-zone");
+
+/* Intro sequence */
+setTimeout(() => {
+  charContainer.classList.add("bowing");
+  bubble.innerText = "I'm really sorry for yesterday";
+  bubble.style.opacity = 1;
+}, 1000);
+
+setTimeout(() => {
+  charContainer.classList.remove("bowing");
+  charContainer.classList.add("sitting");
+  chair.style.opacity = 1;
+  bubble.style.opacity = 0;
+}, 3500);
+
+setTimeout(() => {
+  ui.classList.add("active");
+  isActive = true;
+}, 4500);
+
+/* Actions */
+function doSlap() {
+  if (!isActive) return;
+  slaps++;
+  animate("slap");
+  bubble.innerText = "Okay… I deserve that 😔";
+  bubble.style.opacity = 1;
+  checkEnd();
+}
+
+function doKiss() {
+  if (!isActive) return;
+  kisses++;
+  animate("kiss");
+  spawnHearts();
+  bubble.innerText = "Thank you… that means a lot 💖";
+  bubble.style.opacity = 1;
+  checkEnd();
+}
+
+/* Listeners */
+document.getElementById("btn-slap").addEventListener('pointerdown', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  doSlap();
+});
+
+document.getElementById("btn-kiss").addEventListener('pointerdown', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  doKiss();
+});
+
+tapZone.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  doSlap(); // Tapping screen defaults to slap
+});
+
+function animate(type){
+  character.classList.remove("slap","kiss");
+  void character.offsetWidth; // Trigger reflow
+  character.classList.add(type);
+}
+
+/* Hearts */
+function spawnHearts(){
+  for(let i=0; i<4; i++){
+    let h = document.createElement("div");
+    h.className="heart";
+    h.innerText="💖";
+    
+    // Calculate position relative to the character
+    const rect = character.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    h.style.left = (centerX + Math.random()*80-50)+"px";
+    h.style.top = (centerY + Math.random()*40-20)+"px";
+    
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(), 1200);
+  }
+}
+
+/* Ending */
+function checkEnd(){
+  if(slaps >= max || kisses >= max){
+    isActive = false;
+    ui.style.opacity = "0";
+    ui.style.pointerEvents = "none";
+    
+    setTimeout(()=>{
+      // Character stands up
+      charContainer.classList.remove("sitting");
+      chair.style.opacity = 0;
+      bubble.innerText = "I love u ❤️";
+      character.classList.add("glow");
+      spawnHearts();
+      setTimeout(spawnHearts, 400);
+      setTimeout(spawnHearts, 800);
+    }, 1000);
+  }
+}
+</script>
+
+</body>
+</html>
