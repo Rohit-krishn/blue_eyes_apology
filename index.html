@@ -18,16 +18,12 @@ body{
   transition:1s;
 }
 
-/* DARK MODE (sad ending) */
 body.sad-mode{
   background: radial-gradient(circle at center, #444, #111);
 }
 
-/* SCENE */
 #scene{
   text-align:center;
-  position:relative;
-  z-index:10;
 }
 
 /* BUBBLE */
@@ -38,40 +34,36 @@ body.sad-mode{
   border-radius:22px;
   margin-bottom:20px;
   font-size:1.2rem;
-  max-width:300px;
-  min-height:50px;
-}
-
-/* AVATAR */
-#avatar{
-  transition:0.4s;
+  max-width:320px;
+  min-height:60px;
+  line-height:1.4;
 }
 
 /* HEAD */
 #head{
-  width:160px;
-  height:160px;
+  width:170px;
+  height:170px;
   border-radius:50%;
   overflow:hidden;
 
   background-image:url("Rohit.jpeg");
-  background-size:260%;
-  background-position:55% 25%;
+  background-size:cover;
+  background-position:center;
 
   border:5px solid white;
-
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
-  transition:0.3s;
 
   animation:idle 5s infinite ease-in-out;
 }
 
+/* SAD FACE FIXED (FULL FACE VISIBLE) */
 #head.sad{
   background-image:url("Rohit_sad.jpeg");
-  filter: grayscale(30%) brightness(0.8);
+  background-size:cover;       /* IMPORTANT */
+  background-position:center;  /* FULL FACE */
+  filter: grayscale(20%) brightness(0.9);
 }
 
-/* IDLE */
 @keyframes idle{
   0%,100%{transform:rotate(0deg);}
   50%{transform:rotate(2deg);}
@@ -79,12 +71,12 @@ body.sad-mode{
 
 /* BODY */
 #body{
-  width:170px;
-  height:95px;
+  width:180px;
+  height:100px;
   background:#2f2f2f;
   border-radius:30px;
   margin:auto;
-  margin-top:-25px;
+  margin-top:-30px;
 }
 
 /* UI */
@@ -105,6 +97,7 @@ button{
   border-radius:50px;
   margin:5px;
   cursor:pointer;
+  font-size:1rem;
 }
 
 /* ANIMATIONS */
@@ -116,7 +109,7 @@ button{
 
 .head-kiss{ animation:kiss 0.4s; }
 @keyframes kiss{
-  50%{transform:scale(1.2);}
+  50%{transform:scale(1.15);}
 }
 
 .glow{
@@ -137,7 +130,6 @@ button{
 
 <body>
 
-<!-- MUSIC -->
 <audio id="music" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
@@ -160,54 +152,84 @@ button{
 
 <script>
 
-/* ELEMENTS */
 const bubble = document.getElementById("bubble");
 const head = document.getElementById("head");
 const ui = document.getElementById("ui");
 const music = document.getElementById("music");
 
 let slaps=0, kisses=0, active=false, musicStarted=false;
+let typingTimer=null;
 
-/* TYPEWRITER */
-function typeText(text, speed=40){
+/* FIXED TYPEWRITER */
+function typeText(text, speed=35){
+  clearInterval(typingTimer);
   bubble.innerText="";
   bubble.style.opacity=1;
+
   let i=0;
-  let interval=setInterval(()=>{
+  typingTimer=setInterval(()=>{
     bubble.innerText += text[i];
     i++;
-    if(i>=text.length) clearInterval(interval);
+    if(i>=text.length){
+      clearInterval(typingTimer);
+    }
   }, speed);
 }
 
-/* MUSIC */
+/* FIXED MUSIC */
 function startMusic(){
   if(!musicStarted){
-    music.volume=0;
-    music.play().catch(()=>{});
     musicStarted=true;
+
+    music.volume=0;
+    let p = music.play();
+
+    if(p !== undefined){
+      p.catch(()=>{});
+    }
 
     let v=0;
     let fade=setInterval(()=>{
-      if(v>=0.4){ clearInterval(fade);}
-      else{ v+=0.02; music.volume=v;}
+      if(v>=0.4){
+        clearInterval(fade);
+      } else {
+        v+=0.02;
+        music.volume=v;
+      }
     },200);
   }
 }
 
-/* STORY */
-setTimeout(()=>typeText("I didn’t handle things right..."),1000);
-setTimeout(()=>typeText("And I know I hurt you."),4000);
-setTimeout(()=>typeText("You don’t have to forgive me..."),7000);
-setTimeout(()=>typeText("But I wanted to try..."),10000);
-setTimeout(()=>{
+/* STORY (FIXED TIMING) */
+async function story(){
+  await delay(1000);
+  typeText("I didn’t handle things right...");
+
+  await delay(3000);
+  typeText("And I know I hurt you.");
+
+  await delay(3000);
+  typeText("You don’t have to forgive me...");
+
+  await delay(3000);
+  typeText("But I wanted to try...");
+
+  await delay(3000);
   typeText("React however you feel.");
+
   ui.classList.add("active");
   active=true;
-},13000);
+}
+
+function delay(ms){
+  return new Promise(r=>setTimeout(r,ms));
+}
+
+story();
 
 /* ACTIONS */
-function slap(){
+function slap(e){
+  e?.stopPropagation();
   startMusic();
 
   if(!active){
@@ -216,16 +238,23 @@ function slap(){
   }
 
   slaps++;
+
+  head.classList.remove("head-kiss");
   head.classList.add("head-slap","sad");
+
   setTimeout(()=>head.classList.remove("head-slap"),400);
 
-  if(slaps<3) typeText("...yeah, I deserve that.");
-  else typeText("I really messed up, didn’t I?");
+  if(slaps<3){
+    typeText("...yeah, I deserve that.");
+  } else {
+    typeText("I really messed up, didn’t I?");
+  }
 
   checkEnd();
 }
 
-function kiss(){
+function kiss(e){
+  e?.stopPropagation();
   startMusic();
 
   if(!active){
@@ -234,14 +263,19 @@ function kiss(){
   }
 
   kisses++;
+
+  head.classList.remove("head-slap","sad");
   head.classList.add("head-kiss");
-  head.classList.remove("sad");
+
   setTimeout(()=>head.classList.remove("head-kiss"),400);
 
   spawnHearts();
 
-  if(kisses<3) typeText("You’re kinder than I deserve...");
-  else typeText("Why are you so good to me? 💖");
+  if(kisses<3){
+    typeText("You’re kinder than I deserve...");
+  } else {
+    typeText("Why are you so good to me? 💖");
+  }
 
   checkEnd();
 }
@@ -252,8 +286,10 @@ function spawnHearts(){
     let h=document.createElement("div");
     h.className="heart";
     h.innerText="💖";
-    h.style.left=(window.innerWidth/2 + Math.random()*100-50)+"px";
+
+    h.style.left=(window.innerWidth/2 + Math.random()*120-60)+"px";
     h.style.top=(window.innerHeight/2)+"px";
+
     document.body.appendChild(h);
     setTimeout(()=>h.remove(),1200);
   }
@@ -268,6 +304,7 @@ function checkEnd(){
     setTimeout(()=>{
       if(kisses>slaps){
         typeText("I love you ❤️");
+        head.classList.remove("sad");
         head.classList.add("glow");
         spawnHearts();
       } else {
@@ -279,11 +316,13 @@ function checkEnd(){
 }
 
 /* EVENTS */
-document.getElementById("slap").onclick=slap;
-document.getElementById("kiss").onclick=kiss;
+document.getElementById("slap").addEventListener("click", slap);
+document.getElementById("kiss").addEventListener("click", kiss);
 
 document.body.addEventListener("click",(e)=>{
-  if(e.target.tagName!=="BUTTON") slap();
+  if(e.target.tagName!=="BUTTON"){
+    slap(e);
+  }
 });
 
 </script>
