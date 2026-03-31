@@ -6,292 +6,333 @@
 <title>For You ❤️</title>
 
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  font-family: sans-serif;
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:sans-serif;
   background: radial-gradient(circle at center, #ffdce5, #f8bbd0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  transition: 1s;
-  cursor: pointer; /* Suggest interaction */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  transition:1s;
 }
 
-body.sad-mode {
-  background: radial-gradient(circle at center, #444, #111) !important;
+body.sad-mode{
+  background: radial-gradient(circle at center, #444, #111);
 }
 
-#scene { text-align: center; z-index: 2; }
-
-#bubble {
-  opacity: 0;
-  background: white;
-  padding: 16px 26px;
-  border-radius: 22px;
-  margin: 0 auto 20px auto;
-  font-size: 1.1rem;
-  max-width: 280px;
-  min-height: 50px;
-  line-height: 1.4;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  transition: opacity 0.3s;
+#scene{
+  text-align:center;
 }
 
-#avatar { position: relative; width: 180px; margin: auto; }
-
-#head {
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  background-color: #ddd; /* Fallback */
-  background-image: url("Rohit.jpeg");
-  background-size: cover;
-  background-position: center;
-  border: 5px solid white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  margin: auto;
-  position: relative;
-  z-index: 2;
+/* BUBBLE */
+#bubble{
+  opacity:0;
+  background:white;
+  padding:16px 26px;
+  border-radius:22px;
+  margin-bottom:20px;
+  font-size:1.2rem;
+  max-width:320px;
+  min-height:60px;
+  line-height:1.5;
+  letter-spacing:0.3px;
 }
 
-#head.sad {
-  background-image: url("Rohit_sad.jpeg");
-  filter: grayscale(30%) brightness(0.9);
+/* HEAD */
+#head{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  overflow:hidden;
+
+  /* HAPPY FACE (CROPPED) */
+  background-image:url("Rohit.jpeg");
+  background-size:260%;
+  background-position:55% 25%;
+
+  border:5px solid white;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+
+  animation:idle 5s infinite ease-in-out;
 }
 
-#body {
-  width: 140px;
-  height: 80px;
-  background: #2f2f2f;
-  border-radius: 50px 50px 10px 10px;
-  margin: -40px auto 0 auto;
-  position: relative;
-  z-index: 1;
+/* SAD FACE (FULL IMAGE, NO CROP) */
+#head.sad{
+  background-image:url("Rohit_sad.jpeg");
+  background-size:cover;     /* FULL FACE */
+  background-position:center;
+  filter: grayscale(20%) brightness(0.9);
 }
 
-#ui {
-  margin-top: 25px;
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.5s;
+@keyframes idle{
+  0%,100%{transform:rotate(0deg);}
+  50%{transform:rotate(2deg);}
 }
 
-#ui.active {
-  opacity: 1;
-  visibility: visible;
+/* BODY */
+#body{
+  width:180px;
+  height:100px;
+  background:#2f2f2f;
+  border-radius:30px;
+  margin:auto;
+  margin-top:-30px;
 }
 
-button {
-  padding: 12px 22px;
-  border: none;
-  border-radius: 50px;
-  margin: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: transform 0.1s;
+/* UI */
+#ui{
+  margin-top:25px;
+  opacity:0;
+  pointer-events:none;
+  transition:0.5s;
+}
+#ui.active{
+  opacity:1;
+  pointer-events:auto;
 }
 
-button:active { transform: scale(0.9); }
-#slap { background: #ff5252; color: white; }
-#kiss { background: #ff4081; color: white; }
+button{
+  padding:12px 22px;
+  border:none;
+  border-radius:50px;
+  margin:5px;
+  cursor:pointer;
+}
 
 /* ANIMATIONS */
-.head-slap { animation: slap 0.4s ease; }
-@keyframes slap {
-  0% { transform: rotate(0); }
-  25% { transform: rotate(-20deg) translateX(-10px); }
-  75% { transform: rotate(15deg) translateX(5px); }
-  100% { transform: rotate(0); }
+.head-slap{ animation:slap 0.4s; }
+@keyframes slap{
+  30%{transform:rotate(-25deg);}
+  60%{transform:rotate(20deg);}
 }
 
-.head-kiss { animation: kiss 0.4s ease; }
-@keyframes kiss {
-  50% { transform: scale(1.1); }
+.head-kiss{ animation:kiss 0.4s; }
+@keyframes kiss{
+  50%{transform:scale(1.15);}
 }
 
-.glow { box-shadow: 0 0 50px #ff4081 !important; border-color: #ff4081 !important; }
-
-.heart {
-  position: absolute;
-  font-size: 24px;
-  pointer-events: none;
-  z-index: 10;
-  animation: rise 1.2s ease-out forwards;
+.glow{
+  box-shadow:0 0 40px #ff4081;
 }
 
-@keyframes rise {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
+/* HEARTS */
+.heart{
+  position:absolute;
+  font-size:22px;
+  animation:rise 1.2s forwards;
 }
-
-/* Initial Prompt */
-#tap-hint {
-    position: absolute;
-    bottom: 20px;
-    color: #888;
-    font-size: 0.9rem;
+@keyframes rise{
+  to{opacity:0; transform:translateY(-140px);}
 }
 </style>
 </head>
+
 <body>
 
-<audio id="music" loop>
+<!-- MUSIC -->
+<audio id="music" loop preload="auto">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <div id="scene">
-  <div id="bubble">Click anywhere to start...</div>
-  <div id="avatar">
-    <div id="head"></div>
-    <div id="body"></div>
-  </div>
-  <div id="ui">
-    <button id="slap">👋 Slap</button>
-    <button id="kiss">💋 Kiss</button>
-  </div>
+
+<div id="bubble"></div>
+
+<div id="avatar">
+  <div id="head"></div>
+  <div id="body"></div>
 </div>
 
-<div id="tap-hint">Tap to interact</div>
+<div id="ui">
+  <button id="slap">👋 Slap</button>
+  <button id="kiss">💋 Kiss</button>
+</div>
+
+</div>
 
 <script>
+
 const bubble = document.getElementById("bubble");
 const head = document.getElementById("head");
 const ui = document.getElementById("ui");
 const music = document.getElementById("music");
 
-let slaps = 0, kisses = 0, active = false, storyStarted = false;
-let typingTimer = null;
+let slaps=0, kisses=0, active=false;
+let musicStarted=false;
+let typingTimer=null;
 
-// Function to reset CSS animations so they can play again
-function triggerAnim(className) {
-    head.classList.remove("head-slap", "head-kiss");
-    void head.offsetWidth; // Force Reflow
-    head.classList.add(className);
-}
+/* FIXED TYPEWRITER (WITH SPACE FIX) */
+function typeText(text, speed=35){
+  clearInterval(typingTimer);
+  bubble.innerText="";
+  bubble.style.opacity=1;
 
-function typeText(text, speed = 40) {
-    clearInterval(typingTimer);
-    bubble.innerText = "";
-    bubble.style.opacity = 1;
-    let i = 0;
-    typingTimer = setInterval(() => {
-        if (i < text.length) {
-            bubble.innerText += text[i];
-            i++;
-        } else {
-            clearInterval(typingTimer);
-        }
-    }, speed);
-}
-
-function startMusic() {
-    if (music.paused) {
-        music.volume = 0;
-        music.play().catch(e => console.log("Audio blocked"));
-        let v = 0;
-        let fade = setInterval(() => {
-            if (v >= 0.4) clearInterval(fade);
-            else { v += 0.05; music.volume = v; }
-        }, 200);
+  let i=0;
+  typingTimer=setInterval(()=>{
+    bubble.innerText += text.charAt(i);  // FIXED
+    i++;
+    if(i>=text.length){
+      clearInterval(typingTimer);
     }
+  }, speed);
 }
 
-async function startStory() {
-    if (storyStarted) return;
-    storyStarted = true;
-    document.getElementById("tap-hint").style.display = "none";
-    startMusic();
+/* PERFECT MUSIC UNLOCK */
+function unlockMusic(){
+  if(musicStarted) return;
 
-    const lines = [
-        "I didn’t handle things right...",
-        "And I know I hurt you.",
-        "You don’t have to forgive me...",
-        "But I wanted to try...",
-        "React however you feel."
-    ];
+  musicStarted = true;
 
-    for (let line of lines) {
-        typeText(line);
-        await new Promise(r => setTimeout(r, 3000));
+  const playAudio = () => {
+    music.volume = 0;
+    let playPromise = music.play();
+
+    if(playPromise !== undefined){
+      playPromise.then(()=>{
+        let v=0;
+        let fade=setInterval(()=>{
+          if(v>=0.4){
+            clearInterval(fade);
+          } else {
+            v+=0.02;
+            music.volume=v;
+          }
+        },200);
+      }).catch(()=>{});
     }
+  };
 
-    ui.classList.add("active");
-    active = true;
+  playAudio();
 }
 
-function handleSlap(e) {
-    if (e) e.stopPropagation();
-    if (!storyStarted) { startStory(); return; }
-    if (!active) return;
+/* STORY */
+async function story(){
+  await delay(1000);
+  typeText("I didn’t handle things right...");
 
-    slaps++;
-    triggerAnim("head-slap");
-    head.classList.add("sad");
+  await delay(3000);
+  typeText("And I know I hurt you.");
 
-    if (slaps < 3) typeText("...yeah, I deserve that.");
-    else typeText("I really messed up, didn’t I?");
+  await delay(3000);
+  typeText("You don’t have to forgive me...");
 
-    checkEnd();
+  await delay(3000);
+  typeText("But I wanted to try...");
+
+  await delay(3000);
+  typeText("React however you feel.");
+
+  ui.classList.add("active");
+  active=true;
 }
 
-function handleKiss(e) {
-    if (e) e.stopPropagation();
-    if (!storyStarted) { startStory(); return; }
-    if (!active) return;
-
-    kisses++;
-    triggerAnim("head-kiss");
-    head.classList.remove("sad");
-    spawnHearts();
-
-    if (kisses < 3) typeText("You’re kinder than I deserve...");
-    else typeText("Why are you so good to me? 💖");
-
-    checkEnd();
+function delay(ms){
+  return new Promise(r=>setTimeout(r,ms));
 }
 
-function spawnHearts() {
-    for (let i = 0; i < 6; i++) {
-        const h = document.createElement("div");
-        h.className = "heart";
-        h.innerText = "💖";
-        h.style.left = (window.innerWidth / 2 + (Math.random() * 100 - 50)) + "px";
-        h.style.top = (window.innerHeight / 2 - 20) + "px";
-        document.body.appendChild(h);
-        setTimeout(() => h.remove(), 1200);
-    }
+story();
+
+/* ACTIONS */
+function slap(e){
+  e?.stopPropagation();
+  unlockMusic();
+
+  if(!active){
+    typeText("Wait… please listen first.");
+    return;
+  }
+
+  slaps++;
+
+  head.classList.remove("head-kiss");
+  head.classList.add("head-slap","sad");
+
+  setTimeout(()=>head.classList.remove("head-slap"),400);
+
+  if(slaps<3){
+    typeText("...yeah, I deserve that.");
+  } else {
+    typeText("I really messed up, didn’t I?");
+  }
+
+  checkEnd();
 }
 
-function checkEnd() {
-    if (slaps >= 6 || kisses >= 6) {
-        active = false;
-        ui.classList.remove("active");
+function kiss(e){
+  e?.stopPropagation();
+  unlockMusic();
 
-        setTimeout(() => {
-            if (kisses > slaps) {
-                typeText("I love you ❤️");
-                head.classList.add("glow");
-                setInterval(spawnHearts, 500);
-            } else {
-                typeText("I’ll fix myself… I promise.");
-                document.body.classList.add("sad-mode");
-            }
-        }, 1500);
-    }
+  if(!active){
+    typeText("Wait… please listen first.");
+    return;
+  }
+
+  kisses++;
+
+  head.classList.remove("head-slap","sad");
+  head.classList.add("head-kiss");
+
+  setTimeout(()=>head.classList.remove("head-kiss"),400);
+
+  spawnHearts();
+
+  if(kisses<3){
+    typeText("You’re kinder than I deserve...");
+  } else {
+    typeText("Why are you so good to me? 💖");
+  }
+
+  checkEnd();
 }
 
-// Event Listeners
-document.getElementById("slap").addEventListener("click", handleSlap);
-document.getElementById("kiss").addEventListener("click", handleKiss);
-document.body.addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON") {
-        if (!storyStarted) startStory();
-        else handleSlap(e);
-    }
+/* HEARTS */
+function spawnHearts(){
+  for(let i=0;i<5;i++){
+    let h=document.createElement("div");
+    h.className="heart";
+    h.innerText="💖";
+
+    h.style.left=(window.innerWidth/2 + Math.random()*120-60)+"px";
+    h.style.top=(window.innerHeight/2)+"px";
+
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),1200);
+  }
+}
+
+/* ENDING */
+function checkEnd(){
+  if(slaps>=6 || kisses>=6){
+    active=false;
+    ui.style.opacity=0;
+
+    setTimeout(()=>{
+      if(kisses>slaps){
+        typeText("I love you ❤️");
+        head.classList.remove("sad");
+        head.classList.add("glow");
+        spawnHearts();
+      } else {
+        typeText("I’ll fix myself… I promise.");
+        document.body.classList.add("sad-mode");
+      }
+    },1000);
+  }
+}
+
+/* EVENTS */
+document.getElementById("slap").addEventListener("click", slap);
+document.getElementById("kiss").addEventListener("click", kiss);
+
+/* GLOBAL CLICK = ALSO UNLOCK MUSIC */
+document.body.addEventListener("click",(e)=>{
+  if(e.target.tagName!=="BUTTON"){
+    slap(e);
+  }
 });
+
 </script>
 
 </body>
